@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Compare WMS</title>
+    <meta name="description" content="Easy to use map application">
+    <link href="css/style.css" type="text/css" rel="stylesheet"> 
+   
+    <!-- Own scripts --> 
+    <script type="text/javascript"> 
+	alert("This is an application to compare different web map services. It includes html, css and some javascript.")
+	var status = NONE;
+	
+     function changeWMS(a){ 
+        document.getElementById("map").src=a;
+    }
+	
+	 function clickWMSlogo(a){
+		 changeStaticWMS(a);
+		 changeDynamicWMS(a);
+		 if (a == "google")
+			 document.getElementById("zoom_button").style.display = "block";
+		 else
+			 document.getElementById("zoom_button").style.display = "none";
+	 }	
+	 
+	  function changeStaticWMS(a){
+		if (a == "google")
+			changeWMS("img\\UK_google.png");
+		else if (a == "bing")
+			changeWMS("img\\UK_bing.png");
+		else
+			changeWMS("img\\UK_osm.png");
+	  }
+	  
+	  function changeDynamicWMS(a){
+		  if (a == "google"){
+			  document.getElementById("map_canvas").style.display = "block";
+			  document.getElementById("mymap").style.display = "none";
+		  }
+			  
+		  else if (a == "bing"){
+			  document.getElementById("mymap").style.display = "block";
+			  document.getElementById("map_canvas").style.display = "none";
+			  OnPageLoad();
+		  }
+		  
+		  else{
+			  document.getElementById("map_canvas").style.display = "none";
+			  document.getElementById("mymap").style.display = "none";
+			  alert("OpenLayers/OSM-WMS not implemented, yet. Coming soon.");
+		  }
+			  
+	  }
+	  
+	  function pageload(){
+		  clickWMSlogo("google");
+		  var status = "no_zoom";
+	  }
+	  
+		function zoom(){
+
+			var check = document.getElementById("map_canvas").style.width;
+			if (check == "940px")
+				status = "zoom";
+			else
+				status = "no_zoom";
+			
+			if (status == "no_zoom"){
+		        document.getElementById("mymap").style="position:relative; width:940px; height:800px;";
+		        document.getElementById("map_canvas").style.width="940px";
+		        document.getElementById("map_canvas").style.height="800px";
+		        if (document.getElementById("mymap").style.display == "block"){
+		        	OnPageLoad();
+		       		document.getElementById("map_canvas").style.display = "none";	
+		        } else {
+		        	initialize();
+		        	document.getElementById("mymap").style.display = "none";
+		        	OnPageLoad();
+		        }
+
+
+		        status = "zoom";
+		        
+			} else if (status == "zoom"){
+		        document.getElementById("mymap").style="position:relative; width:470px; height:400px;";
+		        document.getElementById("map_canvas").style.width="470px";
+		        document.getElementById("map_canvas").style.height="400px";
+		        if (document.getElementById("mymap").style.display == "block"){
+		        	OnPageLoad();
+		       		document.getElementById("map_canvas").style.display = "none";	
+		        } else {
+		        	initialize();
+		        	document.getElementById("mymap").style.display = "none";
+		        	OnPageLoad();
+		        }
+
+		        status = "no_zoom"
+			}
+		}
+	  
+
+	</script> 
+	
+	<!-- GoogleMaps script -->
+	<script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <script>
+      function initialize() {
+        var map_canvas = document.getElementById('map_canvas');
+        var map_options = {
+          center: new google.maps.LatLng(54.76267, -2.706299),
+          zoom: 6,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        }
+        var map = new google.maps.Map(map_canvas, map_options)
+      }
+      google.maps.event.addDomListener(window, 'load', initialize);
+    </script>	
+   
+    <!-- BingMaps script --> 
+	<script src="http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.2" type="text/javascript"></script>
+    <script language="javascript" type="text/javascript" >
+        var map = null;
+
+        function OnPageLoad() {
+            var centerat = new VELatLong(54.76267, -2.706299);
+            map = new VEMap('mymap');
+            map.LoadMap(centerat,6,VEMapStyle.Road ,false);
+        }
+
+    </script>
+	
+</head>
+<body onload='pageload()'>
+
+	<div id="cover" align="center"> 
+		<h1 align="center">Compare Web Map Services</h1>
+		<hr width="470px">
+		<h3 align="center">Google vs. Bing vs. the Crowd</h3>		
+	</div>
+    
+    <br><br>
+        
+    <!-- three buttons to change the WMS preview-->
+    <div id="button" align="center"> 
+    	<button type="button" onclick='clickWMSlogo("google");'>
+        <img src="img\button_google.png" width="100" height="100" alt="Google logo"></button>
+    	<button type="button" onclick='clickWMSlogo("bing");'>
+        <img src="img\button_bing.png" width="100" height="100" alt="Bing logo"></button>
+     	<button type="button" onclick='clickWMSlogo("osm");'>
+        <img src="img\button_osm.png" width="100" height="100" alt="OSM logo"></button>
+    </div>
+    <br>
+    
+    <div id="zoom_button" align="center">
+    	<div>Zoom mode:</div>
+        <div class="onoffswitch">
+		    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch">
+		    <label class="onoffswitch-label" for="myonoffswitch">
+		    <div class="onoffswitch-inner" onclick='zoom()'></div>
+		    <div class="onoffswitch-switch" onclick='zoom()'></div>
+		    </label>
+	    </div> 
+    </div>
+    
+    <br>
+    <div id="cover">
+    	<h3 align="center">Dynamic Preview</h3>
+    	<hr width="470px">
+    </div>
+
+    <!-- the dynamic WMS preview -->
+    <div id="dynamicWMS">
+        <div id="map_canvas"></div> <div id='mymap' style="position:relative; width:470px; height:400px;"></div>
+	 </div>
+	 
+	 <br>
+	 
+    <div id="cover">
+    	<h3 align="center">Static Preview</h3>
+    	<hr width="470px">
+    </div>
+    <!--The static WMS preview-->
+    <div id="wms" align="center"> 
+    	<img src="" width="470px"  id="map"  class="wmsmap" alt="Choose your WMS">
+    </div>
+
+    <br><br>
+    <!--Link to about section (CV) of author-->
+    <div id="footer" align="center">
+    	*This page is optimized for a screen-width of 480px*<br>
+        Created by:
+        <FORM METHOD="LINK" ACTION="cv\Kinne_Jan_cv_css.html"> 
+		<INPUT TYPE="submit" VALUE="Jan Kinne">
+		</FORM>
+    </div>
+    
+</body>
+</html>
